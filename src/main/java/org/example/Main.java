@@ -11,25 +11,36 @@ public class Main {
 
 
         final ExecutorService threadPool = Executors.newFixedThreadPool(100);
+        //создать новый поток в FindMax
+        Thread threadOfFindMax = new Thread(new FindMax(sizeToFreq));
+        threadOfFindMax.start();
 
         for (int i = 0; i < 100; i++) {
             Future newFuture = threadPool.submit(new GenerateRoute());
+
             futureList.add(newFuture);
             int result = (int) newFuture.get();
+
+            // Отдать сигнал поиску максимума с информацией об освобождении ресурсов
+
 
             if (sizeToFreq.containsKey(result)) {
                 synchronized (sizeToFreq) {
                     int value = sizeToFreq.get(result);
                     sizeToFreq.replace(result, ++value);
+                    sizeToFreq.notify();
                 }
             } else {
                 synchronized (sizeToFreq) {
                     sizeToFreq.put(result, 1);
+                    sizeToFreq.notify();
                 }
             }
         }
+        threadOfFindMax.interrupt();
+
         int maxValue = 0;
-        int maxKay= 0;
+        int maxKay = 0;
 
         for (Map.Entry<Integer, Integer> item : sizeToFreq.entrySet()) {
             if (item.getValue() > maxValue) {
@@ -49,4 +60,6 @@ public class Main {
 
         threadPool.shutdown();
     }
+
+
 }

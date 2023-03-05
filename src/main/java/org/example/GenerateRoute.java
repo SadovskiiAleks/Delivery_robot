@@ -9,11 +9,9 @@ public class GenerateRoute implements Callable {
     public Integer call() throws Exception {
         int result = 0;
 
-        //Считать количесво повтора R
-
         String resultOfGenerate = generateRoute("RLRFR", 100);
         char[] arrayOfString = resultOfGenerate.toCharArray();
-        for (char charOfString: arrayOfString) {
+        for (char charOfString : arrayOfString) {
             if (charOfString == 'R') {
                 result++;
             }
